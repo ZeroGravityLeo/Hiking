@@ -49,8 +49,10 @@ The app works locally with built-in demo data. To connect a Supabase project, se
 
 ```bash
 VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
+
+`VITE_SUPABASE_ANON_KEY` is still supported as a legacy fallback.
 
 ## Quality Checks
 
