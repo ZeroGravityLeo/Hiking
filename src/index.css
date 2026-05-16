@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 80 18% 97%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 148 36% 22%;
+    --primary-foreground: 80 18% 97%;
+    --secondary: 130 15% 49%;
+    --secondary-foreground: 80 18% 97%;
+    --muted: 76 18% 91%;
+    --muted-foreground: 0 0% 43%;
+    --accent: 40 45% 75%;
+    --accent-foreground: 148 36% 18%;
+    --destructive: 3 68% 45%;
+    --destructive-foreground: 42 40% 97%;
+    --success: 130 18% 42%;
+    --success-foreground: 80 18% 97%;
+    --warning: 35 85% 53%;
+    --warning-foreground: 35 42% 14%;
+    --gold: 46 65% 52%;
+    --gold-foreground: 41 43% 12%;
+    --border: 74 14% 84%;
+    --input: 74 14% 84%;
+    --ring: 148 36% 22%;
+    --radius: 1rem;
+    --shadow-soft: 0 18px 48px hsl(148 36% 16% / 0.1);
+    --shadow-lift: 0 24px 70px hsl(148 36% 16% / 0.16);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  a {
+    @apply text-primary underline-offset-4 hover:underline;
+  }
+
+  ::selection {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+}
+
+@layer components {
+  .wa-page {
+    @apply mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-4 py-5 pb-32 sm:py-7;
+  }
+
+  .wa-section {
+    @apply rounded-2xl border bg-card p-5 shadow-soft;
+  }
+
+  .wa-panel {
+    @apply rounded-2xl border bg-card/95 p-4 shadow-soft backdrop-blur;
+  }
+
+  .wa-lifted {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .wa-chip {
+    @apply inline-flex w-fit items-center gap-1 rounded-full border bg-card/90 px-3 py-1 text-xs font-semibold text-muted-foreground shadow-soft;
+  }
+
+  .wa-hero-media {
+    @apply relative overflow-hidden rounded-[1.25rem] border bg-secondary shadow-soft;
+  }
+
+  .wa-progress-track {
+    @apply h-2 overflow-hidden rounded-full bg-muted;
+  }
+
+  .wa-progress-fill {
+    @apply h-full rounded-full bg-primary transition-all duration-500;
+  }
+
+  .wa-fab {
+    @apply inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-soft transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+
+  .wa-map-control {
+    @apply inline-flex size-10 items-center justify-center rounded-full border bg-card/95 text-foreground shadow-soft backdrop-blur transition hover:bg-secondary hover:text-secondary-foreground;
+  }
+
+  .wa-leaflet-map {
+    @apply min-h-80 overflow-hidden rounded-2xl border bg-secondary shadow-soft;
+  }
+
+  .wa-leaflet-map .leaflet-container {
+    @apply h-full min-h-80 w-full bg-secondary;
+    font: inherit;
+  }
+
+  .wa-leaflet-map .leaflet-popup-content-wrapper,
+  .wa-leaflet-map .leaflet-popup-tip {
+    @apply bg-card text-card-foreground;
+  }
+
+  .wa-leaflet-map .leaflet-popup-content {
+    @apply m-3 text-sm;
+  }
+
+  .wa-trail-marker {
+    @apply flex size-8 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground shadow-soft;
+  }
+
+  .wa-trail-marker::after {
+    @apply block size-3 rounded-full bg-primary-foreground;
+    content: '';
+  }
+
+  .wa-trail-marker--easy {
+    @apply bg-primary;
+  }
+
+  .wa-trail-marker--moderate {
+    @apply bg-accent;
+  }
+
+  .wa-trail-marker--hard {
+    @apply bg-destructive;
+  }
+
+  .wa-trail-marker--selected {
+    @apply ring-4 ring-ring;
+  }
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  font: inherit;
+}
+
+.lb-map-marker {
+  display: grid;
+  height: 34px;
+  width: 34px;
+  place-items: center;
+  border: 3px solid white;
+  border-radius: 999px;
+  background: #557c61;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 12px 24px rgb(30 41 59 / 20%);
+}

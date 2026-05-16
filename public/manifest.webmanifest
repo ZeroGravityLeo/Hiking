@@ -1,0 +1,34 @@
+{
+  "name": "Wild Alberta",
+  "short_name": "WildAB",
+  "description": "Mobile hiking tracker, trail discovery, missions, wildlife collection, and offline-ready activity queue.",
+  "start_url": "/home",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "background_color": "#f8f3e7",
+  "theme_color": "#1b6046",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Tracking",
+      "short_name": "Track",
+      "url": "/tracking",
+      "description": "Open the GPS activity recorder."
+    },
+    {
+      "name": "Explore Trails",
+      "short_name": "Explore",
+      "url": "/explore",
+      "description": "Browse Alberta demo trails."
+    }
+  ]
+}
