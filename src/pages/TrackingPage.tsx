@@ -31,6 +31,7 @@ import { MetricCard } from '@/components/common/MetricCard'
 import { PageHeader } from '@/components/common/PageHeader'
 import { RoutePreviewMap } from '@/components/maps/RoutePreviewMap'
 import { BeforeStartPreparationCard } from '@/components/preparation/BeforeStartPreparationCard'
+import { SplitsTable } from '@/components/tracking/SplitsTable'
 import { TrailMetricGrid } from '@/components/trails/TrailCard'
 import { GeolocationConsentDialog } from '@/components/tracking/GeolocationConsentDialog'
 import { Badge } from '@/components/ui/badge'
@@ -82,8 +83,11 @@ import {
   calculateAveragePace,
   calculateDistanceKm,
   calculateElevationGainM,
+  calculateSplits,
   estimateCalories,
   formatDuration,
+  smoothPoints,
+  type Split,
 } from '@/lib/tracking'
 import type {
   ActivityPhotoAttachment,
@@ -155,6 +159,7 @@ export function TrackingPage() {
   const [summaryCaption, setSummaryCaption] = useState('')
   const [summaryPhotos, setSummaryPhotos] = useState<ActivityPhotoAttachment[]>([])
   const [savingMode, setSavingMode] = useState<PostHikeSaveMode | null>(null)
+  const [savedActivitySplits, setSavedActivitySplits] = useState<Split[]>([])
   const [offRouteAlertsEnabled, setOffRouteAlertsEnabled] = useState(true)
   const [offRouteSensitivity, setOffRouteSensitivity] = useState<OffRouteSensitivity>('medium')
   const [checkInState, setCheckInState] = useState<CheckInReminderState | null>(null)
@@ -164,7 +169,8 @@ export function TrackingPage() {
   const queue = useActivityQueue(user?.id, online)
   const battery = useBatteryStatus()
 
-  const distanceKm = useMemo(() => calculateDistanceKm(points), [points])
+  const smoothedPoints = useMemo(() => smoothPoints(points), [points])
+  const distanceKm = useMemo(() => calculateDistanceKm(smoothedPoints), [smoothedPoints])
   const elevationGainM = useMemo(() => Math.round(calculateElevationGainM(points)), [points])
   const calories = useMemo(() => estimateCalories(elapsedSeconds), [elapsedSeconds])
   const averagePace = useMemo(
@@ -435,6 +441,7 @@ export function TrackingPage() {
     setSummaryCaption('')
     setSummaryPhotos([])
     setSavingMode(null)
+    setSavedActivitySplits([])
     setShowCheckInPrompt(false)
     if (selectedTrail) {
       setCheckInState(armCheckInReminder(selectedTrail))
@@ -493,6 +500,7 @@ export function TrackingPage() {
     setSummaryCaption('')
     setSummaryPhotos([])
     setSavingMode(null)
+    setSavedActivitySplits([])
     setShowCheckInPrompt(false)
     await clearActiveTrackingSession().catch(() => undefined)
   }
@@ -517,6 +525,7 @@ export function TrackingPage() {
     setRestoreSession(null)
     setSessionFinalized(false)
     setSavingMode(null)
+    setSavedActivitySplits([])
     setCheckInState(getCheckInReminderState())
     toast.success('Tracking session restored. Resume when ready.')
   }
@@ -684,7 +693,10 @@ export function TrackingPage() {
     setStatus('saving')
     try {
       const activity = await saveTrackedActivity(payload)
+      const routePoints = activity.route_data?.points ?? []
+      const splits = routePoints.length > 0 ? calculateSplits(smoothPoints(routePoints)) : []
       setSessionFinalized(true)
+      setSavedActivitySplits(splits)
       await clearActiveTrackingSession()
       await queue.refresh()
       setSavedMessage(
@@ -825,7 +837,12 @@ export function TrackingPage() {
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <RoutePreviewMap className="h-64" points={points} trail={selectedTrail} />
+            <RoutePreviewMap
+              className="h-64"
+              livePoints={smoothedPoints}
+              points={points}
+              trail={selectedTrail}
+            />
             {nextCheckpoint ? (
               <div className="rounded-lg border bg-background p-3 text-sm">
                 <p className="font-medium">
@@ -1064,28 +1081,31 @@ export function TrackingPage() {
       </Card>
 
       {status === 'stopped' && points.length > 0 ? (
-        <PostHikeSummaryCard
-          calories={calories}
-          caption={summaryCaption}
-          distanceKm={distanceKm}
-          estimatedCalories={draftSummaryPayload?.preparationSummary?.estimatedCalories ?? null}
-          missionCompletions={draftSummaryPayload?.missionCompletions ?? []}
-          movingSeconds={elapsedSeconds}
-          onAddPhotos={addSummaryPhotos}
-          onCaptionChange={setSummaryCaption}
-          onRemovePhoto={removeSummaryPhoto}
-          onSavePrivate={() => saveActivity('private').catch(() => undefined)}
-          onSetCover={setSummaryCoverPhoto}
-          onShareToFeed={() => saveActivity('feed').catch(() => undefined)}
-          photos={summaryPhotos}
-          points={points}
-          pointsEarned={draftSummaryPayload?.pointsEarned ?? 0}
-          preparationSummary={draftSummaryPayload?.preparationSummary ?? null}
-          savedMessage={savedMessage}
-          savingMode={savingMode}
-          totalSeconds={totalRecordedSeconds}
-          trail={selectedTrail}
-        />
+        <>
+          <PostHikeSummaryCard
+            calories={calories}
+            caption={summaryCaption}
+            distanceKm={distanceKm}
+            estimatedCalories={draftSummaryPayload?.preparationSummary?.estimatedCalories ?? null}
+            missionCompletions={draftSummaryPayload?.missionCompletions ?? []}
+            movingSeconds={elapsedSeconds}
+            onAddPhotos={addSummaryPhotos}
+            onCaptionChange={setSummaryCaption}
+            onRemovePhoto={removeSummaryPhoto}
+            onSavePrivate={() => saveActivity('private').catch(() => undefined)}
+            onSetCover={setSummaryCoverPhoto}
+            onShareToFeed={() => saveActivity('feed').catch(() => undefined)}
+            photos={summaryPhotos}
+            points={points}
+            pointsEarned={draftSummaryPayload?.pointsEarned ?? 0}
+            preparationSummary={draftSummaryPayload?.preparationSummary ?? null}
+            savedMessage={savedMessage}
+            savingMode={savingMode}
+            totalSeconds={totalRecordedSeconds}
+            trail={selectedTrail}
+          />
+          <SplitsTable splits={savedActivitySplits} />
+        </>
       ) : null}
 
       <Card>
