@@ -1,0 +1,4 @@
+# Exact historical false positives, classified 2026-10-17.
+# A localStorage record name, not a credential.
+# No path or rule-wide exclusions; new occurrences remain detectable.
+b818911157549152609ae314c90466d9e649c10c:src/lib/trail-navigation.ts:generic-api-key:6
